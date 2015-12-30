@@ -55,7 +55,7 @@ class BigbluebuttonController extends JControllerLegacy
 		$meetingId = $input->get('meetingId');
 		$db = JFactory::getDbo();
 	    	$query = $db->getQuery(true);
-	    	$query = "SELECT moderatorPW FROM `#__bbb_meetings` WHERE `id`=".$meetingId;
+	    	$query = "SELECT moderatorPW FROM `#__bbb_meetings` WHERE `meetingId`=".$meetingId;
 	    	$db->setQuery($query);
 		$password = $db->loadResult();
 		
@@ -95,6 +95,13 @@ class BigbluebuttonController extends JControllerLegacy
 		$app = &JFactory::getApplication();
 		$app->redirect("index.php?option=com_bigbluebutton&view=records&message=success");
 		jexit();
+	}
+
+	public function getRecordingsUrl($meetingId = null) {
+		$input = JFactory::getApplication()->input;
+		$recordId = $input->get('meetingId');
+		$bbb = new BigbluebuttonHelper();
+		$bbb->getRecordingsUrl($meetingId);
 	}
 
 }// class

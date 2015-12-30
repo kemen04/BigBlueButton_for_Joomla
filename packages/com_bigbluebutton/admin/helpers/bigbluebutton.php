@@ -22,9 +22,9 @@ class BigbluebuttonHelper
     
     function __construct () {
   	$params = JComponentHelper::getParams('com_bigbluebutton');
-        $this->salt = $params->get('salt');
-    	$this->url = $params->get('url');
-    	$this->dialNumber = $params->get('dialNumber');
+        $this->salt = trim($params->get('salt'));
+    	$this->url = trim($params->get('url'));
+    	$this->dialNumber = trim($params->get('dialNumber'));
     }
     
     public function meeting($id = 1, $username = null, $password = null) {
@@ -33,12 +33,12 @@ class BigbluebuttonHelper
     	$query = $db->getQuery(true);
     	$query = "SELECT * FROM `#__bbb_meetings` WHERE `id`=".$id;
     	$db->setQuery($query);
-	$data = $db->loadObject();
+		$data = $db->loadObject();
 	
 	if ($data->attendeePW == $password || $data->moderatorPW == $password) {
 		
 		$creationParams = array(
-			'meetingId' => $id,
+			'meetingId' => $data->meetingId,
 			'meetingName' => $data->meetingName,
 			'attendeePw' => $data->attendeePW,
 			'moderatorPw' => $data->moderatorPW,
@@ -67,7 +67,7 @@ class BigbluebuttonHelper
 			}	
 			else { 
 				if ($result['returncode'] == 'SUCCESS') {
-					$output = $this->getlink ($id, $username, $password);
+					$output = $this->getlink ($data->meetingId, $username, $password);
 				}
 				else {
 					$output = "Meeting creation failed";
@@ -154,8 +154,8 @@ class BigbluebuttonHelper
     	
     	$bbb = new BigBlueButton($this->salt, $this->url);
     	$recordingsParams = array(
-		'meetingId' => $meetingId, 			
-	);
+		'meetingId' => $meetingId,
+		);
 	
 	$itsAllGood = true;
 	
@@ -174,7 +174,10 @@ class BigbluebuttonHelper
 			if ($result['returncode'] == 'SUCCESS') {
 				foreach ((array) $result as $data) {
 					$item['recordId'] = (string) $data['recordId'][0];
-					$item['playbackFormatUrl']= (string) $data['playbackFormatUrl'][0];					
+					$item['playbackFormatUrl']= (string) $data['playbackFormatUrl'][0];
+					$item['published']= (string) $data['published'][0];
+					$item['startTime']= date("j-F-Y, g:i:s A", (int) $data['startTime'][0] / 1000);		
+					$item['endTime']=  date("j-F-Y, g:i:s A", (int) $data['endTime'][0] / 1000);						
 					array_push($final, $item);
 			}
 				
@@ -184,7 +187,9 @@ class BigbluebuttonHelper
 			}
 		}
 	}	
+	header('Content-Type: application/json');	
 	echo json_encode($final);
+	jexit();
 	
     }
     
@@ -224,6 +229,24 @@ class BigbluebuttonHelper
 	if ($itsAllGood == true) {
 		print_r($result);
 	}
+    }
+
+    public function getRecordingsUrl($meetingId = null) {
+    	
+    	$bbb = new BigBlueButton($this->salt, $this->url);
+    	$recordingParams = array(
+    		'meetingId' => $meetingId,
+    	);
+    	$itsAllGood = true;
+		try {$result = $bbb->getRecordingsUrl($recordingParams);}
+			catch (Exception $e) {
+				echo 'Caught exception: ', $e->getMessage(), "\n";
+				$itsAllGood = false;
+			}
+
+		if ($itsAllGood == true) {
+			print_r($result);
+		}
     }
       
 }

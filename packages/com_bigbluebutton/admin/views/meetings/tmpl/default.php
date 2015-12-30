@@ -106,7 +106,10 @@ if ($params->get('salt') == "" || $params->get('url') == "" ) {
 					<input type="checkbox" name="checkall-toggle" value="" title="(<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
 				</th>
 				<th class="title">
-					<?php echo JHTML::_('grid.sort', 'Id', 'a.id', $listDirn, $listOrder ); ?>
+					<?php //echo JHTML::_('grid.sort', 'Id', 'a.id', $listDirn, $listOrder ); ?>
+				</th>			
+								<th class="title">
+					<?php echo JHTML::_('grid.sort', 'MeetingId', 'a.meetingId', $listDirn, $listOrder ); ?>
 				</th>
 								<th class="title">
 					<?php echo JHTML::_('grid.sort', 'MeetingName', 'a.meetingName', $listDirn, $listOrder ); ?>
@@ -161,7 +164,8 @@ if ($params->get('salt') == "" || $params->get('url') == "" ) {
 				<tr class="row<?php echo $i % 2; ?>"">
 					      
         			<td><?php echo $checked;  ?></td>
-        			<td><?php echo $item->id; ?></td>
+        			<td><?php //echo $item->id; ?></td>
+					<td><?php echo $item->meetingId; ?></td>
         				
 									        <td class="nowrap has-context">
 									        
@@ -191,8 +195,8 @@ if ($params->get('salt') == "" || $params->get('url') == "" ) {
 						<td><?php echo $item->attendeePW; ?></td>
 								 		
 						<td><?php 
-							if ($bbb->isMeetingRunning($item->id) == 'true') {
-								echo "Yes (<a href='".JURI::base()."index.php?option=com_bigbluebutton&task=endMeeting&meetingId=".$item->id."'>End Now</a>)";
+							if ($bbb->isMeetingRunning($item->meetingId) == 'true') {
+								echo "Yes (<a href='".JURI::base()."index.php?option=com_bigbluebutton&task=endMeeting&meetingId=".$item->meetingId."'>End Now</a>)";
 							}
 							else {
 								echo "No";
